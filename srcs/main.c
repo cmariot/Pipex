@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/22 15:50:03 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/22 22:56:32 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/22 23:14:26 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 
 int	main(int argc, char **argv)
 {
+//	char	*file1;
+//	char	*cmd1;
+//	char	*cmd2;
+	char	*file2 = argv[1];
+
 	int	stdout_bckp;
 	int	fd;
 
@@ -21,7 +26,7 @@ int	main(int argc, char **argv)
 	{
 		//Create a redirection
 		stdout_bckp = dup(1);
-		fd = open(argv[1], O_RDWR | O_CREAT);
+		fd = open(file2, O_RDWR | O_CREAT);
 		if (fd == -1)
 		{
 			ft_putstr("Error, the file could not be open\n");
