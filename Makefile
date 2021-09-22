@@ -6,7 +6,7 @@
 #    By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/08/10 10:00:43 by cmariot           #+#    #+#              #
-#    Updated: 2021/09/22 17:21:38 by cmariot          ###   ########.fr        #
+#    Updated: 2021/09/22 18:37:46 by cmariot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,10 +17,9 @@ PROGRAM = pipex
 
 PROGRAM_DIR = srcs
 
-PROGRAM_SRCS_OBJS = ${PROGRAM_SRCS:.c=.o}
+PROGRAM_OBJS = ${PROGRAM_SRCS:.c=.o}
 
 PROGRAM_SRCS = ${PROGRAM_DIR}/main.c
-
 
 
 ### COMPILATION ###
@@ -38,11 +37,12 @@ REMOVE = rm -rf
 
 ${PROGRAM}:		program_compil
 
-program_compil: compil_libft ${PROGRAM_SRCS_OBJS}
-				@${COMPILER} ${COMPILER_FLAGS} ${PROGRAM_SRCS_OBJS} -I ${INCLUDES_DIR} -L ${LIBFT_DIR} -lft -o ${PROGRAM}
+program_compil: compil_libft ${PROGRAM_OBJS}
+				@${COMPILER} ${COMPILER_FLAGS} ${PROGRAM_OBJS} -I ${INCLUDES_DIR} -L ${LIBFT_DIR} -lft -o ${PROGRAM}
 				@printf "The pipex program is ready.\n"
 
 all:			program_compil
+
 
 #### LIBFT ####
 
@@ -55,24 +55,21 @@ compil_libft:
 #### NORM ####
 
 norm:
-				norminette ./srcs ./includes ./libft ./bonus
-				@printf "The norm is checked in this directory and all subdirectories.\n"
+				norminette
+				@printf "The norm is checked.\n"
 
 
 #### CLEAN ####
 
 clean:
 				@cd libft && make clean
-				@${REMOVE} ${PROGRAM_SRCS_OBJS}
-				@${REMOVE} ${CHECKER_SRCS_OBJS}
+				@${REMOVE} ${PROGRAM_OBJS}
 				@printf "The object files have been deleted.\n"
 
 fclean:			
 				@cd libft && make fclean
-				@${REMOVE} ${PROGRAM_SRCS_OBJS}
-				@${REMOVE} ${CHECKER_SRCS_OBJS}
+				@${REMOVE} ${PROGRAM_OBJS}
 				@${REMOVE} ${PROGRAM}
-				@${REMOVE} ${CHECKER}
 				@printf "The object and binary files have been deleted.\n"
 
 re:				fclean all
