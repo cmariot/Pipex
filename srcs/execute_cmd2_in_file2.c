@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:31:38 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/23 16:36:52 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/23 17:32:41 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	execute_cmd2(char *cmd2, char **env)
 
 	cmd2_array = ft_split(cmd2, ' ');
 	cmd2_name = cmd2_array[0];
-	pathname = ft_strjoin("/usr/bin/", cmd2_name);
+	pathname = ft_strjoin("/bin/", cmd2_name);
 	if (execve(pathname, cmd2_array, env) == -1)
 		perror("execve");
 	free(pathname);
@@ -39,7 +39,7 @@ int	create_redirection(char *file2)
 	int	fd;
 
 	stdout_bckp = dup(1);
-	fd = open(file2, O_RDWR | O_CREAT, 0600);
+	fd = open(file2, O_RDWR | O_CREAT | O_SYMLINK | O_TRUNC, 0600);
 	if (fd == -1)
 	{
 		ft_putstr("Error, the file could not be create.\n");
