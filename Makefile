@@ -6,7 +6,7 @@
 #    By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/08/10 10:00:43 by cmariot           #+#    #+#              #
-#    Updated: 2021/09/22 18:37:46 by cmariot          ###   ########.fr        #
+#    Updated: 2021/09/23 16:34:33 by cmariot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,8 @@ PROGRAM_DIR = srcs
 
 PROGRAM_OBJS = ${PROGRAM_SRCS:.c=.o}
 
-PROGRAM_SRCS = ${PROGRAM_DIR}/main.c
+PROGRAM_SRCS = ${PROGRAM_DIR}/main.c \
+			   ${PROGRAM_DIR}/execute_cmd2_in_file2.c
 
 
 ### COMPILATION ###
