@@ -1,0 +1,13 @@
+total 2720
+drwxr-xr-x@  12 cmariot  staff      384 23 sep 22:41 .
+drwxr-xr-x@  15 cmariot  staff      480 23 sep 22:41 ..
+drwxr-xr-x@  16 cmariot  staff      512 23 sep 17:51 .git
+-rw-r--r--    1 cmariot  staff       78 22 sep 23:07 .gitmodules
+-rw-r--r--    1 cmariot  staff     2033 23 sep 17:22 Makefile
+-rw-rw-r--@   1 cmariot  staff     5810 22 sep 20:34 README.md
+-rw-r--r--@   1 cmariot  staff  1321529 22 sep 18:16 en.subject.pdf
+drwxr-xr-x@   3 cmariot  staff       96 23 sep 17:22 includes
+drwxr-xr-x@ 107 cmariot  staff     3424 23 sep 22:20 libft
+-rwxr-xr-x    1 cmariot  staff    51762 23 sep 22:20 pipex
+drwxr-xr-x@  11 cmariot  staff      352 23 sep 22:20 srcs
+-rw-------    1 cmariot  staff        0 23 sep 22:41 test
