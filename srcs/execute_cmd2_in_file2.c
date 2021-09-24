@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:31:38 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/23 17:32:41 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/24 13:43:14 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int	create_redirection(char *file2)
 	int	fd;
 
 	stdout_bckp = dup(1);
-	fd = open(file2, O_RDWR | O_CREAT | O_SYMLINK | O_TRUNC, 0600);
+	fd = open(file2, O_RDWR | O_CREAT | O_TRUNC, 0600);
 	if (fd == -1)
 	{
 		ft_putstr("Error, the file could not be create.\n");
