@@ -6,7 +6,7 @@
 #    By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/08/10 10:00:43 by cmariot           #+#    #+#              #
-#    Updated: 2021/09/26 13:23:32 by cmariot          ###   ########.fr        #
+#    Updated: 2021/09/26 14:08:16 by cmariot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -77,6 +77,7 @@ fclean:
 				@cd libft && make fclean
 				@${REMOVE} ${PROGRAM_OBJS}
 				@${REMOVE} ${PROGRAM}
+				@${REMOVE} file1 file2
 				@printf "The object and binary files have been deleted.\n"
 
 re:				fclean all
