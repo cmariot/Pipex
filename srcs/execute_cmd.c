@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/25 16:53:43 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/26 16:39:37 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/27 00:01:12 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,34 @@ char	*get_path_line_in_env(char **env)
 	}
 	if (path_line == NULL)
 	{
-		perror("path not found");
+		ft_putstr_fd("Path line not found in env\n", 2);
 		return (NULL);
 	}
 	return (path_line);
+}
+
+int	fork_command(char *command_path, char **command_array, char **env)
+{
+	pid_t	pid;
+	int		status;
+	
+	pid = fork();
+	if (pid == -1)
+	{
+		ft_putstr_fd("Error, during fork in try_command()\n", 2);
+		return (-1);
+	}
+	else if (pid == 0)
+	{
+		execve(command_path, command_array, env);
+		return (-1);
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+		free(command_path);
+		return (0);
+	}
 }
 
 /* For all the possible path of env,
@@ -44,7 +68,7 @@ char	*get_path_line_in_env(char **env)
    Check if the command exist and if it can be execute, if ok execute it.
    If it's execute, the child process stops.
    Else try the next path.  */
-void	try_command(char **path_array, char **command_array, char **env)
+int	try_command(char **path_array, char **command_array, char **env)
 {
 	char	*path_with_slash;
 	char	*command_path;
@@ -57,12 +81,15 @@ void	try_command(char **path_array, char **command_array, char **env)
 		command_path = ft_strjoin(path_with_slash, command_array[0]);
 		free(path_with_slash);
 		if (access(command_path, F_OK) == 0)
+		{
 			if (access(command_path, X_OK) == 0)
-				execve(command_path, command_array, env);
-		free(command_path);
+				if (fork_command(command_path, command_array, env) == 0)
+					return (0);
+			free(command_path);
+		}
 		i++;
 	}
-	return ;
+	return (-1);
 }
 
 /* Get the line which contains all the path in env,
@@ -70,28 +97,33 @@ void	try_command(char **path_array, char **command_array, char **env)
    Split this line with the ':' delimiter,
    Split the command with the ' ' dilimiter, 
    Try the command in all the possible path. */
-void	execute_cmd(char *command, char **env)
+int	execute_cmd(char *command, char **env)
 {
 	char	*path_line;
 	char	**path_array;
 	char	**command_array;
+	int		command_result;
 
 	path_line = get_path_line_in_env(env);
 	if (path_line == NULL)
-		return ;
+		return (-1);
 	path_array = ft_split(path_line, ':');
 	free(path_line);
 	if (path_array == NULL)
-		return ;
+		return (-1);
 	command_array = ft_split(command, ' ');
 	if (command_array == NULL)
 	{
 		ft_free_array(path_array);
-		return ;
+		return (-1);
 	}
-	try_command(path_array, command_array, env);
+	command_result = try_command(path_array, command_array, env);
 	ft_free_array(path_array);
 	ft_free_array(command_array);
-	perror("Error, The command1 could not be found.\n");
-	exit(1);
+	if (command_result == -1)
+	{
+		ft_putstr_fd("Error, the command could not be not found.\n", 2);
+		return (-1);
+	}
+	return (0);
 }
