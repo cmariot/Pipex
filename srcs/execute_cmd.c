@@ -6,12 +6,15 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/25 16:53:43 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/26 14:00:50 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/26 16:39:37 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
+/* In the env array, check if the line begins by "PATH=",
+   if a line is found, get the line without it's 5 first characters.
+   Else, error. */
 char	*get_path_line_in_env(char **env)
 {
 	char	*path_line;
@@ -36,33 +39,59 @@ char	*get_path_line_in_env(char **env)
 	return (path_line);
 }
 
+/* For all the possible path of env,
+   Put a '/' and the command at the end of the path,
+   Check if the command exist and if it can be execute, if ok execute it.
+   If it's execute, the child process stops.
+   Else try the next path.  */
+void	try_command(char **path_array, char **command_array, char **env)
+{
+	char	*path_with_slash;
+	char	*command_path;
+	int		i;
+
+	i = 0;
+	while (path_array[i] != NULL)
+	{
+		path_with_slash = ft_strjoin(path_array[i], "/");
+		command_path = ft_strjoin(path_with_slash, command_array[0]);
+		free(path_with_slash);
+		if (access(command_path, F_OK) == 0)
+			if (access(command_path, X_OK) == 0)
+				execve(command_path, command_array, env);
+		free(command_path);
+		i++;
+	}
+	return ;
+}
+
+/* Get the line which contains all the path in env,
+   (type env in a terminal to see the env array)
+   Split this line with the ':' delimiter,
+   Split the command with the ' ' dilimiter, 
+   Try the command in all the possible path. */
 void	execute_cmd(char *command, char **env)
 {
 	char	*path_line;
 	char	**path_array;
-	char	*path_with_slash;
 	char	**command_array;
-	char	*command_path;
 
 	path_line = get_path_line_in_env(env);
 	if (path_line == NULL)
 		return ;
 	path_array = ft_split(path_line, ':');
+	free(path_line);
 	if (path_array == NULL)
 		return ;
-	free(path_line);
 	command_array = ft_split(command, ' ');
 	if (command_array == NULL)
-		return ;
-	while (*path_array++ != NULL)
 	{
-		path_with_slash = ft_strjoin(*path_array, "/");
-		command_path = ft_strjoin(path_with_slash, command_array[0]);
-		free(path_with_slash);
-		//fork before execve ?
-		execve(command_path, command_array, env);
-		free(command_path);
+		ft_free_array(path_array);
+		return ;
 	}
+	try_command(path_array, command_array, env);
 	ft_free_array(path_array);
 	ft_free_array(command_array);
+	perror("Error, The command1 could not be found.\n");
+	exit(1);
 }

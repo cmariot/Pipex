@@ -6,13 +6,18 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/22 15:50:03 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/26 13:58:25 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/26 16:38:15 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	parent(char *file2, int *fd, char *command2, char **env)
+/* In the parent, we want fd[0] as STDIN and file2 as STDOUT
+   We open the file2, if it doesn't exist it's create, 
+   Create redirections with dup2(), close unused FD,
+   Execute command1 (input = file1, output = fd[1])
+   Restore redirections. */
+void	parent(char *file2, int *pipe_fd, char *command2, char **env)
 {
 	int	fd_file2;
 
@@ -22,7 +27,7 @@ void	parent(char *file2, int *fd, char *command2, char **env)
 		perror("Error, file2 have not been created in the parent process.\n");
 		exit(EXIT_FAILURE);
 	}
-	if (dup2(fd[0], STDIN) == -1)
+	if (dup2(pipe_fd[0], STDIN) == -1)
 	{
 		perror("parent stdin dup2");
 		exit(EXIT_FAILURE);
@@ -32,14 +37,18 @@ void	parent(char *file2, int *fd, char *command2, char **env)
 		perror("parent stdout dup2");
 		exit(EXIT_FAILURE);
 	}
-	close(fd[1]);
+	close(pipe_fd[1]);
 	close(fd_file2);
-	//fork ?
 	execute_cmd(command2, env);
 	exit(EXIT_FAILURE);
 }
 
-void	child(char *file1, int *fd, char *command1, char **env)
+/* In the child, we want file1 as STDIN and fd[1] as STDOUT
+   We open the file1,
+   Create redirections with dup2(), close unused FD,
+   Execute command1 (input = file1, output = fd[1])
+   Restore redirections. */
+void	child(char *file1, int *pipe_fd, char *command1, char **env)
 {
 	int	fd_file1;
 
@@ -54,18 +63,20 @@ void	child(char *file1, int *fd, char *command1, char **env)
 		perror("child stdin dup2");
 		exit(EXIT_FAILURE);
 	}
-	if (dup2(fd[1], STDOUT) == -1)
+	if (dup2(pipe_fd[1], STDOUT) == -1)
 	{
 		perror("child stdout dup2");
 		exit(EXIT_FAILURE);
 	}
-	close(fd[0]);
+	close(pipe_fd[0]);
 	close(fd_file1);
-	//fork ?
 	execute_cmd(command1, env);
 	exit(EXIT_FAILURE);
 }
 
+/* In the main we create a pipe, the fd[0] and the fd[1] are linked,
+   We also create a fork,
+   The parent process will wait until it's child finished. */
 int	main(int argc, char **argv, char **env)
 {
 	int		fd[2];
