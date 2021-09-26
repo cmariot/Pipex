@@ -6,7 +6,7 @@
 #    By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/08/10 10:00:43 by cmariot           #+#    #+#              #
-#    Updated: 2021/09/23 16:34:33 by cmariot          ###   ########.fr        #
+#    Updated: 2021/09/26 13:23:32 by cmariot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ PROGRAM_DIR = srcs
 PROGRAM_OBJS = ${PROGRAM_SRCS:.c=.o}
 
 PROGRAM_SRCS = ${PROGRAM_DIR}/main.c \
-			   ${PROGRAM_DIR}/execute_cmd2_in_file2.c
+			   ${PROGRAM_DIR}/execute_cmd.c
 
 
 ### COMPILATION ###
@@ -44,6 +44,12 @@ program_compil: compil_libft ${PROGRAM_OBJS}
 
 all:			program_compil
 
+
+#### TEST ####
+
+test:			program_compil
+				@cp Makefile file1
+				./pipex file1 "grep src" "wc -l" file2
 
 #### LIBFT ####
 

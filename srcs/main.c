@@ -6,67 +6,78 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/22 15:50:03 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/25 12:23:49 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/26 13:25:52 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
+void parent(int file2, int *fd, char *command2, char **env)
+{
+	if (dup2(fd[0], STDIN) == -1)
+	{
+		perror("parent stdin dup2");
+		exit(EXIT_FAILURE);
+	}
+	if (dup2(file2, STDOUT) == -1)
+	{
+		perror("parent stdout dup2");
+		exit(EXIT_FAILURE);
+	}
+	close(fd[1]);
+	close(file2);
+	execute_cmd(command2, env);
+	exit(EXIT_FAILURE);
+}
+
+void child(int file1, int *fd, char *command1, char **env)
+{
+	if (dup2(file1, STDIN) == -1)
+	{
+		perror("child stdin dup2");
+		exit(EXIT_FAILURE);
+	}
+	if (dup2(fd[1], STDOUT) == -1)
+	{
+		perror("child stdout dup2");
+		exit(EXIT_FAILURE);
+	}
+	close(fd[0]);
+	close(file1);
+	execute_cmd(command1, env);
+	exit(EXIT_FAILURE);
+}
+
 int	main(int argc, char **argv, char **env)
 {
-	char	*file1;
-	char	*cmd1;
-	char	*cmd2;
-	char	*file2;
 	int		fd[2];
-	int		pid;
+	pid_t	pid;
+	int		status;
+	int		file1;
+	int		file2;
 
-	file1 = argv[1];
-	cmd1 = argv[2];
-	cmd2 = argv[3];
-	file2 = argv[4];
-	if (argc != 0)
+	if (argc != 5)
+		return (-1);
+	file2 = open(argv[4], O_RDWR | O_CREAT | O_TRUNC, 0644);
+	file1 = open(argv[1], O_RDONLY);
+	if (file1 == -1 || file2 == -1)
+		perror("Error, file1 or file2 couldn't be open.\n");
+	pipe(fd);
+	pid = fork();
+	if (pid == -1)
 	{
-		pipe(fd);
-		pid = fork();
-		if (pid == -1)
-		{
-			perror("fork");
-			return (-1);
-		}
-		if (pid == 0)
-		{
-			printf("I'm the child, my pid is %d\n", pid);
-			int	stdin_bckp;
-			int	file1_fd;
-
-			stdin_bckp = dup(0);
-			file1_fd = open(argv[1], O_RDONLY);
-			if (file1_fd == -1)
-			{
-				perror("open file1");
-				return (-1);
-			}
-			dup2(file1_fd, 0);
-			close(file1_fd);
-			
-			char	*line;
-			while (1)
-			{
-				line = get_next_line(file1_fd);
-				ft_putstr_fd(line, file1_fd);
-				if (line == NULL)
-					break ;
-				free(line);
-			}
-			exit(EXIT_SUCCESS);
-		}
-		else
-		{
-			wait(NULL);
-			printf("I'm the parent, my pid is %d\n", getpid());
-			execute_cmd2_in_file2(cmd2, file2, env);
-		}
+		perror("Error, the fork failed.\n");
+		exit(EXIT_FAILURE);
 	}
-	return (0);
+	if (pid == 0)
+	{
+		child(file1, fd, argv[2], env);
+		exit(EXIT_SUCCESS);
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+		parent(file2, fd, argv[3], env);
+		return (0);
+	}
 }
