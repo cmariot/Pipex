@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/25 16:53:43 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/26 13:20:43 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/26 14:00:50 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ void	execute_cmd(char *command, char **env)
 		path_with_slash = ft_strjoin(*path_array, "/");
 		command_path = ft_strjoin(path_with_slash, command_array[0]);
 		free(path_with_slash);
+		//fork before execve ?
 		execve(command_path, command_array, env);
 		free(command_path);
 	}

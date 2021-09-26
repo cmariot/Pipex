@@ -6,33 +6,50 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/22 15:50:03 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/26 13:25:52 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/26 13:58:25 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void parent(int file2, int *fd, char *command2, char **env)
+void	parent(char *file2, int *fd, char *command2, char **env)
 {
+	int	fd_file2;
+
+	fd_file2 = open(file2, O_RDWR | O_CREAT | O_TRUNC, 0644);
+	if (fd_file2 == -1)
+	{
+		perror("Error, file2 have not been created in the parent process.\n");
+		exit(EXIT_FAILURE);
+	}
 	if (dup2(fd[0], STDIN) == -1)
 	{
 		perror("parent stdin dup2");
 		exit(EXIT_FAILURE);
 	}
-	if (dup2(file2, STDOUT) == -1)
+	if (dup2(fd_file2, STDOUT) == -1)
 	{
 		perror("parent stdout dup2");
 		exit(EXIT_FAILURE);
 	}
 	close(fd[1]);
-	close(file2);
+	close(fd_file2);
+	//fork ?
 	execute_cmd(command2, env);
 	exit(EXIT_FAILURE);
 }
 
-void child(int file1, int *fd, char *command1, char **env)
+void	child(char *file1, int *fd, char *command1, char **env)
 {
-	if (dup2(file1, STDIN) == -1)
+	int	fd_file1;
+
+	fd_file1 = open(file1, O_RDONLY);
+	if (fd_file1 == -1)
+	{
+		perror("Error, file1 couldn't be open.\n");
+		exit(EXIT_FAILURE);
+	}
+	if (dup2(fd_file1, STDIN) == -1)
 	{
 		perror("child stdin dup2");
 		exit(EXIT_FAILURE);
@@ -43,7 +60,8 @@ void child(int file1, int *fd, char *command1, char **env)
 		exit(EXIT_FAILURE);
 	}
 	close(fd[0]);
-	close(file1);
+	close(fd_file1);
+	//fork ?
 	execute_cmd(command1, env);
 	exit(EXIT_FAILURE);
 }
@@ -53,31 +71,25 @@ int	main(int argc, char **argv, char **env)
 	int		fd[2];
 	pid_t	pid;
 	int		status;
-	int		file1;
-	int		file2;
 
 	if (argc != 5)
 		return (-1);
-	file2 = open(argv[4], O_RDWR | O_CREAT | O_TRUNC, 0644);
-	file1 = open(argv[1], O_RDONLY);
-	if (file1 == -1 || file2 == -1)
-		perror("Error, file1 or file2 couldn't be open.\n");
 	pipe(fd);
 	pid = fork();
 	if (pid == -1)
 	{
 		perror("Error, the fork failed.\n");
-		exit(EXIT_FAILURE);
+		return (-1);
 	}
 	if (pid == 0)
 	{
-		child(file1, fd, argv[2], env);
-		exit(EXIT_SUCCESS);
+		child(argv[1], fd, argv[2], env);
+		return (0);
 	}
 	else
 	{
 		waitpid(pid, &status, 0);
-		parent(file2, fd, argv[3], env);
-		return (0);
+		parent(argv[4], fd, argv[3], env);
+		return (1);
 	}
 }

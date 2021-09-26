@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/22 16:39:46 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/26 13:27:07 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/26 13:57:18 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@
 # define STDERR 2
 
 int		main(int argc, char **argv, char **env);
-void	child(int file1, int *fd, char *command1, char **env);
-void	parent(int file2, int *fd, char *command2, char **env);
-void	execute_cmd(char *command, char **env);
+void	child(char *file1, int *fd, char *command1, char **env);
+void	parent(char *file2, int *fd, char *command2, char **env);
 char	*get_path_line_in_env(char **env);
+void	execute_cmd(char *command, char **env);
 
 #endif
