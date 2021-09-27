@@ -6,7 +6,7 @@
 #    By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/08/10 10:00:43 by cmariot           #+#    #+#              #
-#    Updated: 2021/09/27 13:06:46 by cmariot          ###   ########.fr        #
+#    Updated: 2021/09/27 15:15:06 by cmariot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,8 @@ PROGRAM_DIR = srcs
 PROGRAM_OBJS = ${PROGRAM_SRCS:.c=.o}
 
 PROGRAM_SRCS = ${PROGRAM_DIR}/main.c \
-			   ${PROGRAM_DIR}/execute_cmd.c
+			   ${PROGRAM_DIR}/execute_cmd.c \
+			   ${PROGRAM_DIR}/pipex_bonus.c
 
 
 ### COMPILATION ###

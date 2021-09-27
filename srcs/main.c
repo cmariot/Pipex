@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/22 15:50:03 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/27 13:19:41 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/27 15:15:58 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,25 +117,28 @@ int	main(int argc, char **argv, char **env)
 	pid_t	pid;
 	int		status;
 
-	if (argc != 5)
+	if (argc == 5)
 	{
-		ft_putstr_fd("Usage : ./pipex file1 'cmd1' 'cmd2' file2\n", 2);
-		return (-1);
+		pipe(fd);
+		pid = fork();
+		if (pid == -1)
+		{
+			ft_putstr_fd("Error, the main fork failed.\n", 2);
+			return (-1);
+		}
+		if (pid == 0)
+			child(argv[1], fd, argv[2], env);
+		else
+		{
+			waitpid(pid, &status, 0);
+			parent(argv[4], fd, argv[3], env);
+			close(fd[1]);
+		}
+		return (0);
 	}
-	pipe(fd);
-	pid = fork();
-	if (pid == -1)
-	{
-		ft_putstr_fd("Error, the main fork failed.\n", 2);
-		return (-1);
-	}
-	if (pid == 0)
-		child(argv[1], fd, argv[2], env);
+	else if (argc == 6)
+		here_doc(argv, env);	
 	else
-	{
-		waitpid(pid, &status, 0);
-		parent(argv[4], fd, argv[3], env);
-		close(fd[1]);
-	}
+		ft_putstr_fd("Usage : ./pipex file1 'cmd1' 'cmd2' file2\n", 2);
 	return (0);
 }
