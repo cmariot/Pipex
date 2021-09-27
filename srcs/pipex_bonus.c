@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/27 15:13:10 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/27 19:02:36 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/27 19:58:13 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,28 +15,36 @@
 // get_next_line(0) -> STDOUT
 void	child_bonus(char **argv, char **env, int *pipe_fd)
 {
-	int		stdin_saved;
 	int		stdout_saved;
 	char	*line;
 	char	*limiter;
 
 
-	stdin_saved = dup(STDIN);	
 	stdout_saved = dup(STDOUT);
+	close(pipe_fd[0]);
+	dup2(pipe_fd[1], STDOUT);
 	limiter = ft_strjoin(argv[2], "\n");
-	while (ft_strcmp(line, limiter) != 0)
+	while (1)
 	{
-		ft_putstr_fd("heredoc> ", 1);
-		line = get_next_line(0);
+		ft_putstr_fd("heredoc> ", stdout_saved);
+		line = get_next_line(STDIN);
+		if (ft_strcmp(line, limiter) == 0)
+		{
+			free(line);
+			break ;
+		}
+		else
+		{
+			ft_putstr(line);
+			free(line);
+		}
 	}
 	ft_putstr(*env);
-	printf("%d\n", pipe_fd[1]);
-	printf("%d\n", stdin_saved);
-	printf("%d\n", stdout_saved);
 	free(limiter);
+	exit(EXIT_SUCCESS);
 }
 
-int	pipex_bonus(char **argv, char **env)
+int	fork_bonus(char **argv, char **env)
 {
 	int		fd[2];
 	pid_t	pid;
@@ -50,7 +58,9 @@ int	pipex_bonus(char **argv, char **env)
 		return (-1);
 	}
 	if (pid == 0)
+	{
 		child_bonus(argv, env, fd);
+	}
 	else
 	{
 		waitpid(pid, &status, 0);
@@ -70,6 +80,6 @@ int	here_doc(char **argv, char **env)
 		ft_putstr_fd("Error, usage : ./pipex here_doc file1 'cmd1' 'cmd2' file2\n", 2);
 		return (-1);
 	}
-	pipex_bonus(argv, env);
+	fork_bonus(argv, env);
 	return (0);
 }
