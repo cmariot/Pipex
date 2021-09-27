@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/22 15:50:03 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/27 11:34:02 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/27 13:19:41 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	parent_redirection(char *file2, int *pipe_fd, int stdin_saved)
    We open the file2, if it doesn't exist it's create, 
    Create redirections with dup2(), close unused FD,
    Execute command1 (input = file1, output = fd[1])
-   Restore redirections. */
+   Restore the default redirections. */
 void	parent(char *file2, int *pipe_fd, char *command2, char **env)
 {
 	int	stdin_saved;
@@ -67,7 +67,9 @@ void	child_redirection(char *file1, int *pipe_fd, int stdin_saved)
 	fd_file1 = open(file1, O_RDONLY);
 	if (fd_file1 == -1)
 	{
-		ft_putstr_fd("Error, file1 couldn't be open.\n", 2);
+		ft_putstr_fd("Error, no such file or directory : ", 2);
+		ft_putstr_fd(file1, 2);
+		ft_putstr_fd("\n", 2);
 		exit(EXIT_FAILURE);
 	}
 	if (dup2(fd_file1, STDIN) == -1)
@@ -91,7 +93,7 @@ void	child_redirection(char *file1, int *pipe_fd, int stdin_saved)
    We open the file1,
    Create redirections with dup2(), close unused FD,
    Execute command1 (input = file1, output = fd[1])
-   Restore redirections. */
+   Restore the default redirections. */
 void	child(char *file1, int *pipe_fd, char *command1, char **env)
 {
 	int	stdin_saved;

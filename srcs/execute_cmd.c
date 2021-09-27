@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/25 16:53:43 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/27 11:36:17 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/27 13:21:54 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,9 @@ char	*get_path_line_in_env(char **env)
 	return (path_line);
 }
 
-int	fork_command(char *command_path, char **command_array, char **env)
+/* Create a new process in which the command is execute,
+ * the parent process will wait the child exit to free command_path. */
+int	fork_command(char **command_path, char **command_array, char **env)
 {
 	pid_t	pid;
 	int		status;
@@ -52,13 +54,13 @@ int	fork_command(char *command_path, char **command_array, char **env)
 	}
 	else if (pid == 0)
 	{
-		execve(command_path, command_array, env);
-		return (-1);
+		execve(*command_path, command_array, env);
+		exit(EXIT_FAILURE);
 	}
 	else
 	{
 		waitpid(pid, &status, 0);
-		free(command_path);
+		free(*command_path);
 		return (0);
 	}
 }
@@ -81,12 +83,10 @@ int	try_command(char **path_array, char **command_array, char **env)
 		command_path = ft_strjoin(path_with_slash, command_array[0]);
 		free(path_with_slash);
 		if (access(command_path, F_OK) == 0)
-		{
 			if (access(command_path, X_OK) == 0)
-				if (fork_command(command_path, command_array, env) == 0)
+				if (fork_command(&command_path, command_array, env) == 0)
 					return (0);
-			free(command_path);
-		}
+		free(command_path);
 		i++;
 	}
 	return (-1);
@@ -97,30 +97,31 @@ int	try_command(char **path_array, char **command_array, char **env)
    Split this line with the ':' delimiter,
    Split the command with the ' ' dilimiter, 
    Try the command in all the possible path. */
-int	execute_cmd(char *command, char **env)
+void	execute_cmd(char *command, char **env)
 {
 	char	*path_line;
 	char	**path_array;
 	char	**command_array;
-	int		command_result;
 
 	path_line = get_path_line_in_env(env);
 	if (path_line == NULL)
-		return (-1);
+		return ;
 	path_array = ft_split(path_line, ':');
 	free(path_line);
 	if (path_array == NULL)
-		return (-1);
+		return ;
 	command_array = ft_split(command, ' ');
 	if (command_array == NULL)
 	{
 		ft_free_array(path_array);
-		return (-1);
+		return ;
 	}
-	command_result = try_command(path_array, command_array, env);
+	if (try_command(path_array, command_array, env) == -1)
+	{
+		ft_putstr_fd("Error, command not found : ", 2);
+		ft_putstr_fd(command_array[0], 2);
+		ft_putstr_fd("\n", 2);
+	}
 	ft_free_array(path_array);
 	ft_free_array(command_array);
-	if (command_result == -1)
-		ft_putstr_fd("Error, the command could not be not found.\n", 2);
-	return (0);
 }

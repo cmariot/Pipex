@@ -6,7 +6,7 @@
 #    By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/08/10 10:00:43 by cmariot           #+#    #+#              #
-#    Updated: 2021/09/26 14:08:16 by cmariot          ###   ########.fr        #
+#    Updated: 2021/09/27 13:06:46 by cmariot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,7 +39,7 @@ REMOVE = rm -rf
 ${PROGRAM}:		program_compil
 
 program_compil: compil_libft ${PROGRAM_OBJS}
-				@${COMPILER} ${COMPILER_FLAGS} ${PROGRAM_OBJS} -I ${INCLUDES_DIR} -L ${LIBFT_DIR} -lft -o ${PROGRAM}
+				@${COMPILER} ${COMPILER_FLAGS} ${PROGRAM_OBJS} -I ${INCLUDES_DIR} -L ${LIBFT_DIR} -lft -g -o ${PROGRAM}
 				@printf "The pipex program is ready.\n"
 
 all:			program_compil
