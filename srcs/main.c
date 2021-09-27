@@ -6,11 +6,39 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/22 15:50:03 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/26 23:51:07 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/27 11:34:02 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+/* Create the redirection FD[0] (STDIN) --> FILE2 (STDOUT) */
+void	parent_redirection(char *file2, int *pipe_fd, int stdin_saved)
+{
+	int	fd_file2;
+
+	fd_file2 = open(file2, O_RDWR | O_CREAT | O_TRUNC, 0644);
+	if (fd_file2 == -1)
+	{
+		ft_putstr_fd("Error, open file2 failed.\n", 2);
+		exit(EXIT_FAILURE);
+	}
+	if (dup2(pipe_fd[0], STDIN) == -1)
+	{
+		ft_putstr_fd("Error, in stdin parent redirect\n", 2);
+		close(fd_file2);
+		exit(EXIT_FAILURE);
+	}
+	if (dup2(fd_file2, STDOUT) == -1)
+	{
+		dup2(stdin_saved, 0);
+		close(fd_file2);
+		ft_putstr_fd("Error, in stdout parent redirect\n", 2);
+		exit(EXIT_FAILURE);
+	}
+	close(pipe_fd[1]);
+	close(fd_file2);
+}
 
 /* In the parent, we want fd[0] as STDIN and file2 as STDOUT
    We open the file2, if it doesn't exist it's create, 
@@ -19,39 +47,20 @@
    Restore redirections. */
 void	parent(char *file2, int *pipe_fd, char *command2, char **env)
 {
-	int	fd_file2;
+	int	stdin_saved;
+	int	stdout_saved;
 
-	fd_file2 = open(file2, O_RDWR | O_CREAT | O_TRUNC, 0644);
-	if (fd_file2 == -1)
-	{
-		ft_putstr_fd("Error, file2 haven't been created in parent process.\n", 2);
-		exit(EXIT_FAILURE);
-	}
-	if (dup2(pipe_fd[0], STDIN) == -1)
-	{
-		perror("parent stdin dup2");
-		ft_putstr_fd("Error, in parent when dup2(fd[0], STDIN)\n", 2);
-		exit(EXIT_FAILURE);
-	}
-	if (dup2(fd_file2, STDOUT) == -1)
-	{
-		ft_putstr_fd("Error, in parent when dup2(file2, STDOUT)\n", 2);
-		exit(EXIT_FAILURE);
-	}
-	close(pipe_fd[1]);
-	close(fd_file2);
+	stdin_saved = dup(STDIN);
+	stdout_saved = dup(STDOUT);
+	parent_redirection(file2, pipe_fd, stdin_saved);
 	execute_cmd(command2, env);
-	dup2(0, pipe_fd[0]);
-	dup2(1, fd_file2);
+	dup2(stdin_saved, 0);
+	dup2(stdout_saved, 1);
 	exit(EXIT_SUCCESS);
 }
 
-/* In the child, we want file1 as STDIN and fd[1] as STDOUT
-   We open the file1,
-   Create redirections with dup2(), close unused FD,
-   Execute command1 (input = file1, output = fd[1])
-   Restore redirections. */
-void	child(char *file1, int *pipe_fd, char *command1, char **env)
+/* Create the redirection FILE1 (SDTIN) --> FD[1] (STDOUT) */
+void	child_redirection(char *file1, int *pipe_fd, int stdin_saved)
 {
 	int	fd_file1;
 
@@ -63,19 +72,37 @@ void	child(char *file1, int *pipe_fd, char *command1, char **env)
 	}
 	if (dup2(fd_file1, STDIN) == -1)
 	{
-		ft_putstr_fd("Error, in child when dup2(file1, STDIN)\n", 2);
+		ft_putstr_fd("Error, in stdin child redirect\n", 2);
+		close(fd_file1);
 		exit(EXIT_FAILURE);
 	}
 	if (dup2(pipe_fd[1], STDOUT) == -1)
 	{
-		ft_putstr_fd("Error, in child when dup2(fd[1], STDOUT)\n", 2);
+		ft_putstr_fd("Error, in stdout child redirect\n", 2);
+		dup2(stdin_saved, 0);
+		close(fd_file1);
 		exit(EXIT_FAILURE);
 	}
 	close(pipe_fd[0]);
 	close(fd_file1);
+}
+
+/* In the child, we want file1 as STDIN and fd[1] as STDOUT
+   We open the file1,
+   Create redirections with dup2(), close unused FD,
+   Execute command1 (input = file1, output = fd[1])
+   Restore redirections. */
+void	child(char *file1, int *pipe_fd, char *command1, char **env)
+{
+	int	stdin_saved;
+	int	stdout_saved;
+
+	stdin_saved = dup(STDIN);
+	stdout_saved = dup(STDOUT);
+	child_redirection(file1, pipe_fd, stdin_saved);
 	execute_cmd(command1, env);
-	dup2(0, fd_file1);
-	dup2(1, pipe_fd[1]);
+	dup2(stdin_saved, 0);
+	dup2(stdout_saved, 1);
 	exit(EXIT_SUCCESS);
 }
 
@@ -106,6 +133,7 @@ int	main(int argc, char **argv, char **env)
 	{
 		waitpid(pid, &status, 0);
 		parent(argv[4], fd, argv[3], env);
+		close(fd[1]);
 	}
 	return (0);
 }

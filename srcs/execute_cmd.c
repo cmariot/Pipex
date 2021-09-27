@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/25 16:53:43 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/27 00:01:12 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/27 11:36:17 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	fork_command(char *command_path, char **command_array, char **env)
 {
 	pid_t	pid;
 	int		status;
-	
+
 	pid = fork();
 	if (pid == -1)
 	{
@@ -121,9 +121,6 @@ int	execute_cmd(char *command, char **env)
 	ft_free_array(path_array);
 	ft_free_array(command_array);
 	if (command_result == -1)
-	{
 		ft_putstr_fd("Error, the command could not be not found.\n", 2);
-		return (-1);
-	}
 	return (0);
 }
