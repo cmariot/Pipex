@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/27 15:13:10 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/27 15:45:08 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/27 19:02:36 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ void	child_bonus(char **argv, char **env, int *pipe_fd)
 	limiter = ft_strjoin(argv[2], "\n");
 	while (ft_strcmp(line, limiter) != 0)
 	{
+		ft_putstr_fd("heredoc> ", 1);
 		line = get_next_line(0);
-		
 	}
 	ft_putstr(*env);
 	printf("%d\n", pipe_fd[1]);
