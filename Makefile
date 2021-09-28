@@ -6,7 +6,7 @@
 #    By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/08/10 10:00:43 by cmariot           #+#    #+#              #
-#    Updated: 2021/09/28 16:05:28 by cmariot          ###   ########.fr        #
+#    Updated: 2021/09/28 17:54:24 by cmariot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,10 +19,11 @@ PROGRAM_DIR = srcs
 
 PROGRAM_OBJS = ${PROGRAM_SRCS:.c=.o}
 
-PROGRAM_SRCS = ${PROGRAM_DIR}/main.c \
+PROGRAM_SRCS = ${PROGRAM_DIR}/double_redirection.c \
 			   ${PROGRAM_DIR}/execute_cmd.c \
-			   ${PROGRAM_DIR}/pipex_bonus.c
-
+			   ${PROGRAM_DIR}/main.c \
+			   ${PROGRAM_DIR}/single_redirection.c
+ 
 
 ### COMPILATION ###
 

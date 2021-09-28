@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_bonus.c                                      :+:      :+:    :+:   */
+/*   double_redirection.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/09/27 15:13:10 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/28 16:12:40 by cmariot          ###   ########.fr       */
+/*   Created: 2021/09/28 17:49:36 by cmariot           #+#    #+#             */
+/*   Updated: 2021/09/28 17:50:56 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,44 +97,4 @@ void	child_bonus(char **argv, char **env, int *pipe_fd)
 	dup2(stdin_saved, 0);
 	dup2(stdout_saved, 1);
 	exit(EXIT_SUCCESS);
-}
-
-int	fork_bonus(char **argv, char **env)
-{
-	int		fd[2];
-	pid_t	pid;
-	int		status;
-
-	pipe(fd);
-	pid = fork();
-	if (pid == -1)
-	{
-		ft_putstr_fd("Error, the bonus fork failed.\n", 2);
-		return (-1);
-	}
-	if (pid == 0)
-	{
-		child_bonus(argv, env, fd);
-	}
-	else
-	{
-		waitpid(pid, &status, 0);
-		parent_bonus(argv[5], fd, argv[4], env);
-		close(fd[1]);
-	}
-	return (0);
-}
-
-int	here_doc(char **argv, char **env)
-{
-	char *here_doc;
-
-	here_doc = argv[1];
-	if (ft_strcmp(here_doc, "here_doc"))
-	{
-		ft_putstr_fd("Error, usage : ./pipex here_doc file1 'cmd1' 'cmd2' file2\n", 2);
-		return (-1);
-	}
-	fork_bonus(argv, env);
-	return (0);
 }
