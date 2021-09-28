@@ -6,7 +6,7 @@
 #    By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/08/10 10:00:43 by cmariot           #+#    #+#              #
-#    Updated: 2021/09/27 15:15:06 by cmariot          ###   ########.fr        #
+#    Updated: 2021/09/28 16:05:28 by cmariot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,11 +46,15 @@ program_compil: compil_libft ${PROGRAM_OBJS}
 all:			program_compil
 
 
-#### TEST ####
+#### TESTS ####
 
 test:			program_compil
 				@cp Makefile file1
 				./pipex file1 "grep src" "wc -l" file2
+
+bonus_test:		program_compil
+				./pipex here_doc stop "grep e" "wc -l" file2
+
 
 #### LIBFT ####
 

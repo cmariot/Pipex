@@ -6,11 +6,52 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/27 15:13:10 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/28 15:52:00 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/28 16:12:40 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+void	parent_redirection_bonus(char *file2, int *pipe_fd, int stdin_saved)
+{
+	int	fd_file2;
+
+	fd_file2 = open(file2, O_RDWR | O_CREAT | O_APPEND, 0644);
+	if (fd_file2 == -1)
+	{
+		ft_putstr_fd("Error, open file2 failed.\n", 2);
+		exit(EXIT_FAILURE);
+	}
+	if (dup2(pipe_fd[0], STDIN) == -1)
+	{
+		ft_putstr_fd("Error, in stdin parent redirect\n", 2);
+		close(fd_file2);
+		exit(EXIT_FAILURE);
+	}
+	if (dup2(fd_file2, STDOUT) == -1)
+	{
+		dup2(stdin_saved, 0);
+		close(fd_file2);
+		ft_putstr_fd("Error, in stdout parent redirect\n", 2);
+		exit(EXIT_FAILURE);
+	}
+	close(pipe_fd[1]);
+	close(fd_file2);
+}
+
+void	parent_bonus(char *file2, int *pipe_fd, char *command2, char **env)
+{
+	int	stdin_saved;
+	int	stdout_saved;
+
+	stdin_saved = dup(STDIN);
+	stdout_saved = dup(STDOUT);
+	parent_redirection_bonus(file2, pipe_fd, stdin_saved);
+	execute_cmd(command2, env);
+	dup2(stdin_saved, 0);
+	dup2(stdout_saved, 1);
+	exit(EXIT_SUCCESS);
+}
 
 int	create_heredoc(char **argv)
 {
@@ -78,7 +119,7 @@ int	fork_bonus(char **argv, char **env)
 	else
 	{
 		waitpid(pid, &status, 0);
-		parent(argv[5], fd, argv[4], env);
+		parent_bonus(argv[5], fd, argv[4], env);
 		close(fd[1]);
 	}
 	return (0);
