@@ -6,23 +6,24 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/27 15:13:10 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/27 19:58:13 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/28 14:40:05 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-// get_next_line(0) -> STDOUT
+// get_next_line(0) -> FD[1] (STDOUT)
 void	child_bonus(char **argv, char **env, int *pipe_fd)
 {
 	int		stdout_saved;
 	char	*line;
 	char	*limiter;
 
-
+	//Make redirection from input to pipe_fd[1]
 	stdout_saved = dup(STDOUT);
-	close(pipe_fd[0]);
 	dup2(pipe_fd[1], STDOUT);
+	close(pipe_fd[0]);
+	//Get input from 0 and print it on pipe_fd[1]
 	limiter = ft_strjoin(argv[2], "\n");
 	while (1)
 	{
@@ -35,11 +36,15 @@ void	child_bonus(char **argv, char **env, int *pipe_fd)
 		}
 		else
 		{
-			ft_putstr(line);
+			ft_putstr_fd(line, pipe_fd[1]);
 			free(line);
 		}
 	}
-	ft_putstr(*env);
+	//Function on input
+	execute_cmd(argv[3], env);
+	ft_putstr_fd("Execute function ok\n", 2);
+	//Restore redirection
+	dup2(stdout_saved, 1);	
 	free(limiter);
 	exit(EXIT_SUCCESS);
 }
@@ -64,7 +69,7 @@ int	fork_bonus(char **argv, char **env)
 	else
 	{
 		waitpid(pid, &status, 0);
-		//parent(argv[4], fd, argv[3], env);
+		parent(argv[5], fd, argv[4], env);
 		close(fd[1]);
 	}
 	return (0);
