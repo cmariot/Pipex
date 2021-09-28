@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/25 16:53:43 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/28 14:43:05 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/28 15:48:26 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ int	fork_command(char **command_path, char **command_array, char **env)
 	else if (pid == 0)
 	{
 		execve(*command_path, command_array, env);
+		ft_putstr_fd("Command execution error\n", 2);
 		exit(EXIT_FAILURE);
 	}
 	else

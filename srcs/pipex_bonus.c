@@ -6,46 +6,55 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/27 15:13:10 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/28 14:40:05 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/28 15:52:00 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-// get_next_line(0) -> FD[1] (STDOUT)
-void	child_bonus(char **argv, char **env, int *pipe_fd)
+int	create_heredoc(char **argv)
 {
-	int		stdout_saved;
-	char	*line;
+	int		heredoc_fd;
 	char	*limiter;
+	char	*line;
 
-	//Make redirection from input to pipe_fd[1]
-	stdout_saved = dup(STDOUT);
-	dup2(pipe_fd[1], STDOUT);
-	close(pipe_fd[0]);
-	//Get input from 0 and print it on pipe_fd[1]
+	heredoc_fd = open("here_doc", O_RDWR | O_CREAT | O_TRUNC, 0644);
+	if (heredoc_fd == -1)
+		return (-1);
 	limiter = ft_strjoin(argv[2], "\n");
 	while (1)
 	{
-		ft_putstr_fd("heredoc> ", stdout_saved);
+		ft_putstr_fd("heredoc> ", STDOUT);
 		line = get_next_line(STDIN);
 		if (ft_strcmp(line, limiter) == 0)
-		{
-			free(line);
 			break ;
-		}
 		else
 		{
-			ft_putstr_fd(line, pipe_fd[1]);
+			ft_putstr_fd(line, heredoc_fd);
 			free(line);
 		}
 	}
-	//Function on input
-	execute_cmd(argv[3], env);
-	ft_putstr_fd("Execute function ok\n", 2);
-	//Restore redirection
-	dup2(stdout_saved, 1);	
+	free(line);
 	free(limiter);
+	close(heredoc_fd);
+	return (0);
+}
+
+// get_next_line(0) -> FD[1] (STDOUT)
+void	child_bonus(char **argv, char **env, int *pipe_fd)
+{
+	int		stdin_saved;
+	int		stdout_saved;
+
+	if (create_heredoc(argv) == -1)
+		ft_putstr_fd("Error, during here_doc file creation.\n", 2);
+	stdin_saved = dup(STDIN);
+	stdout_saved = dup(STDOUT);
+	child_redirection("here_doc", pipe_fd, stdin_saved);
+	execute_cmd(argv[3], env);
+	unlink("here_doc");
+	dup2(stdin_saved, 0);
+	dup2(stdout_saved, 1);
 	exit(EXIT_SUCCESS);
 }
 
