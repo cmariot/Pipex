@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/22 15:50:03 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/28 17:51:58 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/29 10:31:58 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,7 @@ int	fork_bonus(char **argv, char **env)
 		return (-1);
 	}
 	if (pid == 0)
-	{
 		child_bonus(argv, env, fd);
-	}
 	else
 	{
 		waitpid(pid, &status, 0);
@@ -38,7 +36,7 @@ int	fork_bonus(char **argv, char **env)
 	return (0);
 }
 
-int	here_doc(char **argv, char **env)
+int	heredoc_bonus(char **argv, char **env)
 {
 	char	*here_doc;
 
@@ -52,7 +50,7 @@ int	here_doc(char **argv, char **env)
 	return (0);
 }
 
-int	simple_redirection_fork(char **argv, char **env)
+int	mandatory(char **argv, char **env)
 {
 	int		fd[2];
 	pid_t	pid;
@@ -82,9 +80,9 @@ int	simple_redirection_fork(char **argv, char **env)
 int	main(int argc, char **argv, char **env)
 {
 	if (argc == 5)
-		simple_redirection_fork(argv, env);
+		mandatory(argv, env);
 	else if (argc == 6)
-		here_doc(argv, env);
+		heredoc_bonus(argv, env);
 	else
 	{
 		ft_putstr_fd("Mandatory usage : ./pipex file1 'cmd1' 'cmd2' file2\n", 2);
