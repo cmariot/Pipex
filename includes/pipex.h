@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/22 16:39:46 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/28 17:57:55 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/29 10:42:08 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,5 +40,6 @@ int		create_heredoc(char **argv);
 void	parent_bonus(char *file2, int *pipe_fd, char *command2, char **env);
 void	parent_redirection_bonus(char *file2, int *pipe_fd, int stdin_saved);
 int		here_doc(char **argv, char **env);
+void	multiple_pipelines_bonus(int argc, char **argv, char **env);
 
 #endif
