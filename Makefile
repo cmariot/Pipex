@@ -5,87 +5,134 @@
 #                                                     +:+ +:+         +:+      #
 #    By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2021/08/10 10:00:43 by cmariot           #+#    #+#              #
-#    Updated: 2021/09/28 17:54:24 by cmariot          ###   ########.fr        #
+#    Created: 2021/09/30 11:15:47 by cmariot           #+#    #+#              #
+#    Updated: 2021/09/30 15:38:34 by cmariot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 
-#### PIPEX ###
+# **************************************************************************** #
+#                          PROJECT'S DIRECTORIES                               #
+# **************************************************************************** #
 
-PROGRAM = pipex
-
-PROGRAM_DIR = srcs
-
-PROGRAM_OBJS = ${PROGRAM_SRCS:.c=.o}
-
-PROGRAM_SRCS = ${PROGRAM_DIR}/double_redirection.c \
-			   ${PROGRAM_DIR}/execute_cmd.c \
-			   ${PROGRAM_DIR}/main.c \
-			   ${PROGRAM_DIR}/single_redirection.c
- 
-
-### COMPILATION ###
-
-COMPILER = gcc
-
-COMPILER_FLAGS = -Wall -Wextra -Werror
-
-INCLUDES_DIR = includes
-
-REMOVE = rm -rf
-
-.c.o:
-				@${COMPILER} ${COMPILER_FLAGS} -g -c $< -o ${<:.c=.o} -I ${INCLUDES_DIR} -I ${LIBFT_DIR}
-
-${PROGRAM}:		program_compil
-
-program_compil: compil_libft ${PROGRAM_OBJS}
-				@${COMPILER} ${COMPILER_FLAGS} ${PROGRAM_OBJS} -I ${INCLUDES_DIR} -L ${LIBFT_DIR} -lft -g -o ${PROGRAM}
-				@printf "The pipex program is ready.\n"
-
-all:			program_compil
+NAME		= pipex
+SRCS_DIR	= srcs
+INCL_DIR	= includes
+LIBFT_DIR	= libft
+OBJS_DIR	= objs/
 
 
-#### TESTS ####
+# **************************************************************************** #
+#                         COMPILATION AND LINK FLAGS                           #
+# **************************************************************************** #
 
-test:			program_compil
-				@cp Makefile file1
-				./pipex file1 "grep src" "wc -l" file2
+CC					= gcc
 
-bonus_test:		program_compil
-				./pipex here_doc stop "grep e" "wc -l" file2
+CFLAGS				= -Wall -Wextra -Werror
+CFLAGS				+= -I $(INCL_DIR)
+CFLAGS				+= -I $(LIBFT_DIR)
 
+LFLAGS				= -Wall -Wextra -Werror
+LFLAGS				+= -L $(LIBFT_DIR) -lft
 
-#### LIBFT ####
-
-LIBFT_DIR = libft
-
-compil_libft:
-				@cd ${LIBFT_DIR} && make
-
-
-#### NORM ####
-
-norm:
-				norminette
-				@printf "The norm is checked.\n"
+# Debug flag, use with 'make DEBUG=1'
+ifeq ($(DEBUG), 1)
+	CFLAGS			+= -g
+endif
 
 
-#### CLEAN ####
+# **************************************************************************** #
+#                                SOURCE FILES                                  #
+# **************************************************************************** #
 
-clean:
-				@cd libft && make clean
-				@${REMOVE} ${PROGRAM_OBJS}
-				@printf "The object files have been deleted.\n"
+SRCS		= main.c \
+			  single_redirection.c \
+			  double_redirection.c \
+			  execute_cmd.c \
+			  multiple_pipelines_bonus.c
 
-fclean:			
-				@cd libft && make fclean
-				@${REMOVE} ${PROGRAM_OBJS}
-				@${REMOVE} ${PROGRAM}
-				@${REMOVE} file1 file2
-				@printf "The object and binary files have been deleted.\n"
+SRC			:= $(notdir $(SRCS))
 
-re:				fclean all
+OBJ			:= $(SRC:.c=.o)
 
-.PHONY:			clean fclean
+OBJS		:= $(addprefix $(OBJS_DIR), $(OBJ))
+
+VPATH		:= $(SRCS_DIR) $(OBJS_DIR) $(shell find $(SRCS_DIR) -type d)
+
+
+# **************************************************************************** #
+#									COLORS                                     #
+# **************************************************************************** #
+
+GR	= \033[32;1m
+RE	= \033[31;1m
+YE	= \033[33;1m
+CY	= \033[36;1m
+RC	= \033[0m
+
+
+# **************************************************************************** #
+#                             MAKEFILE'S RULES                                 #
+# **************************************************************************** #
+
+all : $(NAME)
+
+header :
+		@printf "        _\n  _ __ (_)_ __   _____  __\n | '_ \| | '_ \ / _ \ \/ /\n | |_) | | |_) |  __/>  <\n | .__/|_| .__/ \___/_/\_\ \n |_|     |_|\n\n"
+
+# Compiling
+$(OBJS_DIR)%.o : %.c
+		@mkdir -p $(OBJS_DIR)
+		@$(CC) $(CFLAGS) -c $< -o $@
+		@printf "$(YE)$(CC) $(CFLAGS) -c $< -o $@ ✅ \n$(RC)"
+
+libft_compil:
+		@printf "$(YE)Libft compilation ... "
+		@make -C libft
+		@printf "Success !$(RC)\n\n"
+
+srcs_compil :
+		@printf "$(YE)Source code compilation ... \n$(RC)"
+			
+# Linking
+$(NAME)	: header libft_compil srcs_compil $(SRCS) $(OBJS)
+		@printf "$(YE)$(NAME) compilation success !\n\n$(RC)"
+		@printf "$(GR)Object files linking ...\n$(CC) $(LFLAGS) $(OBJS) $(RC)\n"
+		@$(CC) $(LFLAGS) $(OBJS) -o $(NAME)
+		@printf "$(GR)Success !\n$(NAME) is ready.\n\n$(RC)"
+		@printf "Mandatory usage : ./pipex file1 'cmd1' 'cmd2' file2\n"
+		@printf "Bonus usage : ./pipex limiter 'cmd1' 'cmd2' file2\n\n"
+
+# Check 42 norm 
+norm :
+		@norminette
+
+test:	${NAME}
+		@cp Makefile file1
+		./pipex file1 "grep .c" "wc -l" file2
+
+bonus_test:	${NAME}
+		./pipex here_doc stop "grep e" "wc -l" file2
+
+# Remove object files
+clean :
+		@printf "$(RE)Removing $(OBJS_DIR) ... $(RC)"
+		@rm -rf $(OBJS_DIR)
+		@printf "$(RE)Done$(RC)\n"
+		@printf "$(RE)Cleaning libft ... $(RC)"
+		@make clean -C libft
+		@printf "$(RE)Done$(RC)\n"
+
+# Remove object and binary files
+fclean : clean
+		@printf "$(RE)Removing $(NAME) ... $(RC)"
+		@rm -f $(NAME)
+		@printf "$(RE)Done$(RC)\n"
+		@printf "$(RE)Removing libft.a ... $(RC)"
+		@make fclean -C libft
+		@printf "$(RE)Done$(RC)\n"
+
+# Remove all and recompile
+re :	 fclean all
+
+.PHONY : clean fclean
