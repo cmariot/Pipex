@@ -6,7 +6,7 @@
 #    By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/30 11:15:47 by cmariot           #+#    #+#              #
-#    Updated: 2021/09/30 15:38:34 by cmariot          ###   ########.fr        #
+#    Updated: 2021/09/30 18:20:21 by cmariot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -101,7 +101,7 @@ $(NAME)	: header libft_compil srcs_compil $(SRCS) $(OBJS)
 		@$(CC) $(LFLAGS) $(OBJS) -o $(NAME)
 		@printf "$(GR)Success !\n$(NAME) is ready.\n\n$(RC)"
 		@printf "Mandatory usage : ./pipex file1 'cmd1' 'cmd2' file2\n"
-		@printf "Bonus usage : ./pipex limiter 'cmd1' 'cmd2' file2\n\n"
+		@printf "Bonus usage : ./pipex here_doc limiter 'cmd1' 'cmd2' file2\n\n"
 
 # Check 42 norm 
 norm :

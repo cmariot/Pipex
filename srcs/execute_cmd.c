@@ -6,38 +6,11 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/25 16:53:43 by cmariot           #+#    #+#             */
-/*   Updated: 2021/09/28 15:48:26 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/09/30 18:50:19 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-/* In the env array, check if the line begins by "PATH=",
-   if a line is found, get the line without it's 5 first characters.
-   Else, error. */
-char	*get_path_line_in_env(char **env)
-{
-	char	*path_line;
-	int		i;
-
-	i = 0;
-	path_line = NULL;
-	while (env[i])
-	{
-		if (ft_memcmp(env[i], "PATH=", 5) == 0)
-		{
-			path_line = ft_strdup(env[i] + 5);
-			break ;
-		}
-		i++;
-	}
-	if (path_line == NULL)
-	{
-		ft_putstr_fd("Path line not found in env\n", 2);
-		return (NULL);
-	}
-	return (path_line);
-}
 
 /* Create a new process in which the command is execute,
  * the parent process will wait the child exit to free command_path. */
@@ -78,7 +51,7 @@ int	try_command(char **path_array, char **command_array, char **env)
 	int		i;
 
 	i = 0;
-	while (path_array[i] != NULL)
+	while (path_array[i])
 	{
 		path_with_slash = ft_strjoin(path_array[i], "/");
 		command_path = ft_strjoin(path_with_slash, command_array[0]);
@@ -91,6 +64,33 @@ int	try_command(char **path_array, char **command_array, char **env)
 		i++;
 	}
 	return (-1);
+}
+
+/* In the env array, check if the line begins by "PATH=",
+   if a line is found, get the line without it's 5 first characters.
+   Else, error. */
+char	*get_path_line_in_env(char **env)
+{
+	char	*path_line;
+	int		i;
+
+	i = 0;
+	path_line = NULL;
+	while (env[i])
+	{
+		if (ft_memcmp(env[i], "PATH=", 5) == 0)
+		{
+			path_line = ft_strdup(env[i] + 5);
+			break ;
+		}
+		i++;
+	}
+	if (path_line == NULL)
+	{
+		ft_putstr_fd("Path line not found in env\n", 2);
+		return (NULL);
+	}
+	return (path_line);
 }
 
 /* Get the line which contains all the path in env,
