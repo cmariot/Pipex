@@ -6,7 +6,7 @@
 #    By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/30 11:15:47 by cmariot           #+#    #+#              #
-#    Updated: 2021/09/30 18:20:21 by cmariot          ###   ########.fr        #
+#    Updated: 2021/10/03 20:49:17 by cmariot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -105,14 +105,18 @@ $(NAME)	: header libft_compil srcs_compil $(SRCS) $(OBJS)
 
 # Check 42 norm 
 norm :
-		@norminette
+				@norminette
 
-test:	${NAME}
-		@cp Makefile file1
-		./pipex file1 "grep .c" "wc -l" file2
+test:			${NAME}
+				@cp Makefile file1
+				./pipex file1 "grep .c" "wc -l" file2
 
-bonus_test:	${NAME}
-		./pipex here_doc stop "grep e" "wc -l" file2
+bonus_test1:	${NAME}
+				./pipex here_doc stop "grep e" "wc -l" file2
+
+bonus_test2:	${NAME}
+				@cp Makefile file1
+				./pipex file1 "grep SRC" "grep S" "wc -l" file2
 
 # Remove object files
 clean :
