@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/28 17:45:43 by cmariot           #+#    #+#             */
-/*   Updated: 2021/10/04 12:46:31 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/10/05 11:24:08 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	parent_redirection(char *file2, int *pipe_fd, int stdin_saved)
 
 /* In the parent, we want fd[0] as STDIN and file2 as STDOUT
    We open the file2, if it doesn't exist it's create,
-   Create redirections with dup2(), close unused FD,
+r	  Create redirections with dup2(), close unused FD,
    Execute command1 (input = file1, output = fd[1])
    Restore the default redirections. */
 void	parent(char *file2, int *pipe_fd, char *command2, char **env)
