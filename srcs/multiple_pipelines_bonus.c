@@ -6,83 +6,69 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/29 10:36:53 by cmariot           #+#    #+#             */
-/*   Updated: 2021/10/04 16:50:25 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/10/05 09:01:37 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	multiple_pipelines_bonus(int argc, char **argv, char **env)
+void	child_bonus2(char *cmd, char **env)
 {
-	int 	fd[argc - 4][2];
 	pid_t	pid;
+	int		fd[2];
 	int		status;
-	int		stdin_saved;
-	int		stdout_saved;
-	int 	fd_file1;
 
-	//first redirection
-	pipe(fd[0]);
+	if (pipe(fd) == -1)
+	{
+		ft_putstr_fd("Error, in the bonus pipe process\n", 2);
+		exit(EXIT_FAILURE);
+	}
 	pid = fork();
 	if (pid == -1)
 	{
-		ft_putstr_fd("Error, fork failed\n", 2);
+		ft_putstr_fd("Error, in the bonus fork process\n", 2);
 		exit(EXIT_FAILURE);
 	}
 	else if (pid == 0)
 	{
-		ft_putstr_fd("Child process\n", 1);
-		stdin_saved = dup(STDIN);
-		stdout_saved = dup(STDOUT);
-		fd_file1 = open(argv[1], O_RDONLY);
-		if (fd_file1 == -1)
-		{
-			ft_putstr_fd("Error, the file1 could not be open\n", 2);
-			exit(EXIT_FAILURE);
-		}		
-		dup2(fd_file1, STDIN);
-		dup2(fd[0][1], STDOUT);
-		execute_cmd(argv[2], env);
-		close(fd[0][0]);
-		close(fd_file1);
-		dup2(stdin_saved, 0);
-		dup2(stdout_saved, 1);
-		exit(EXIT_SUCCESS);
-	}
-	else
-	{
-		waitpid(pid, &status, 0);	
-		ft_putstr_fd("Parent process\n", 1);
-	}
-
-	//middle redirections	
-	pipe(fd[1]);
-	pid = fork();
-	if (pid == -1)
-	{
-		ft_putstr_fd("Error, fork failed\n", 2);
-		exit(EXIT_FAILURE);
-	}
-	else if (pid == 0)
-	{
-		ft_putstr_fd("Child processs num 2\n", 1);
-		stdin_saved = dup(STDIN);
-		stdout_saved = dup(STDOUT);
-		//redirection stdin devient fd[0][1]
-		dup2(fd[0][0], STDIN);
-		close(fd[0][1]);
-		//redirection stdout devient fd[1][0]
-		dup2(fd[1][1], STDOUT);
-		execute_cmd(argv[3], env);
-		close(fd[0][1]);
-		dup2(stdin_saved, 0);
-		dup2(stdout_saved, 1);
-		exit(EXIT_SUCCESS);
+		close(fd[0]);
+		dup2(fd[1], STDOUT);
+		execute_cmd(cmd, env);
 	}
 	else
 	{
 		waitpid(pid, &status, 0);
-		ft_putstr_fd("Parent processs num 2\n", 1);
+		close(fd[1]);
+		dup2(fd[0], STDIN);
 	}
-	
+}
+
+void	multiple_pipelines_bonus(int argc, char **argv, char **env)
+{
+	int file1;
+	int	file2;
+	int i;
+
+	file1 = open(argv[1], O_RDONLY);
+	if (file1 == -1)
+	{
+		ft_putstr_fd("Error, the file1 does not extist.\n", 2);
+		exit(EXIT_FAILURE);
+	}
+	file2 = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0640);
+	if (file2 == -1)
+	{
+		ft_putstr_fd("Error, the file2 could not be create.\n", 2);
+		close(file1);
+		exit(EXIT_FAILURE);
+	}
+	dup2(file1, STDIN);
+	i = 2;
+	while (i < (argc - 2))
+	{
+		child_bonus2(argv[i], env);
+		i++;
+	}
+	dup2(file2, STDOUT);
+	execute_cmd(argv[argc - 2], env);
 }

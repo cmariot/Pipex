@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/22 15:50:03 by cmariot           #+#    #+#             */
-/*   Updated: 2021/10/04 11:41:12 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/10/05 09:07:37 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,8 @@ int	main(int argc, char **argv, char **env)
 	else if (argc <= 4)
 	{
 		ft_putstr_fd("Mandatory usage : ./pipex file1 'cmd1' 'cmd2' file2\n", 2);
-		ft_putstr_fd("Bonus usage : ./pipex here_doc limiter 'cmd1' 'cmd2' file2\n", 2);
+		ft_putstr_fd("Multiple pipes : ./pipex file1 'cmd1' 'cmd2' 'cmd3' ... 'cmdN' file2\n", 2);
+		ft_putstr_fd("Heredoc usage : ./pipex here_doc limiter 'cmd1' 'cmd2' file2\n", 2);
 	}
 	return (0);
 }
