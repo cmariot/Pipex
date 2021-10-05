@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/28 17:49:36 by cmariot           #+#    #+#             */
-/*   Updated: 2021/10/05 11:55:07 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/10/05 12:25:11 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,4 +97,28 @@ void	child_bonus(char **argv, char **env, int *pipe_fd)
 	dup2(stdin_saved, 0);
 	dup2(stdout_saved, 1);
 	exit(EXIT_SUCCESS);
+}
+
+int	heredoc_bonus(char **argv, char **env)
+{
+	int		fd[2];
+	pid_t	pid;
+	int		status;
+
+	pipe(fd);
+	pid = fork();
+	if (pid == -1)
+	{
+		ft_putstr_fd("Error, the bonus fork failed.\n", 2);
+		return (-1);
+	}
+	if (pid == 0)
+		child_bonus(argv, env, fd);
+	else
+	{
+		waitpid(pid, &status, 0);
+		parent_bonus(argv[5], fd, argv[4], env);
+		close(fd[1]);
+	}
+	return (0);
 }

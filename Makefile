@@ -6,7 +6,7 @@
 #    By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/30 11:15:47 by cmariot           #+#    #+#              #
-#    Updated: 2021/10/05 12:11:14 by cmariot          ###   ########.fr        #
+#    Updated: 2021/10/05 14:37:48 by cmariot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,10 +46,10 @@ endif
 # **************************************************************************** #
 
 SRCS		= main.c \
-			  single_redirection.c \
-			  double_redirection.c \
+			  mandatory.c \
+			  heredoc.c \
 			  execute_cmd.c \
-			  multiple_pipelines_bonus.c
+			  multi_pipes.c
 
 SRC			:= $(notdir $(SRCS))
 

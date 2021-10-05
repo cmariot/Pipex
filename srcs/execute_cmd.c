@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/25 16:53:43 by cmariot           #+#    #+#             */
-/*   Updated: 2021/10/05 12:11:51 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/10/05 14:49:13 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@ int	fork_command(char **command_path, char **command_array, char **env)
 	else
 	{
 		waitpid(pid, &status, 0);
-		free(*command_path);
+		if (*command_path != NULL)
+			free(*command_path);
 		return (0);
 	}
 }
@@ -49,7 +50,11 @@ int	try_command(char **path_array, char **command_array, char **env)
 	char	*path_with_slash;
 	char	*command_path;
 	int		i;
-
+	
+	if (access(command_array[0], F_OK) == 0)
+		if (access(command_array[0], X_OK) == 0)
+			if (fork_command(&command_array[0], command_array, env) == 0)
+				return (0);
 	i = 0;
 	while (path_array[i])
 	{

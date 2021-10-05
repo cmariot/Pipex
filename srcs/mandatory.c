@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   single_redirection.c                               :+:      :+:    :+:   */
+/*   mandatory.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
+/*   By: cmariot <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/28 17:45:43 by cmariot           #+#    #+#             */
-/*   Updated: 2021/10/05 12:11:55 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/10/05 12:22:54 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	parent_redirection(char *file2, int *pipe_fd, int stdin_saved)
 
 /* In the parent, we want fd[0] as STDIN and file2 as STDOUT
    We open the file2, if it doesn't exist it's create,
-r	  Create redirections with dup2(), close unused FD,
+   Create redirections with dup2(), close unused FD,
    Execute command1 (input = file1, output = fd[1])
    Restore the default redirections. */
 void	parent(char *file2, int *pipe_fd, char *command2, char **env)
@@ -106,4 +106,28 @@ void	child(char *file1, int *pipe_fd, char *command1, char **env)
 	dup2(stdin_saved, 0);
 	dup2(stdout_saved, 1);
 	exit(EXIT_SUCCESS);
+}
+
+int	mandatory(char **argv, char **env)
+{
+	int		fd[2];
+	pid_t	pid;
+	int		status;
+
+	pipe(fd);
+	pid = fork();
+	if (pid == -1)
+	{
+		ft_putstr_fd("Error, the main fork failed.\n", 2);
+		return (-1);
+	}
+	if (pid == 0)
+		child(argv[1], fd, argv[2], env);
+	else
+	{
+		waitpid(pid, &status, 0);
+		parent(argv[4], fd, argv[3], env);
+		close(fd[1]);
+	}
+	return (0);
 }
