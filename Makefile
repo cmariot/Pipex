@@ -33,7 +33,7 @@ CFLAGS				+= -I $(INCL_DIR)
 CFLAGS				+= -I $(LIBFT_DIR)
 
 LFLAGS				= -Wall -Wextra -Werror
-LFLAGS				+= -L $(LIBFT_DIR) -lft
+LIBFT_A				= -L libft -l ft
 
 # Debug flag, use with 'make DEBUG=1'
 ifeq ($(DEBUG), 1)
@@ -98,10 +98,11 @@ srcs_compil :
 $(NAME)	: header libft_compil srcs_compil $(SRCS) $(OBJS)
 		@printf "$(YE)$(NAME) compilation success !\n\n$(RC)"
 		@printf "$(GR)Object files linking ...\n$(CC) $(LFLAGS) $(OBJS) $(RC)\n"
-		@$(CC) $(LFLAGS) $(OBJS) -o $(NAME)
+		@$(CC) $(LFLAGS) $(OBJS) $(LIBFT_A) -o $(NAME)
 		@printf "$(GR)Success !\n$(NAME) is ready.\n\n$(RC)"
-		@printf "Mandatory usage : ./pipex file1 'cmd1' 'cmd2' file2\n"
-		@printf "Bonus usage : ./pipex here_doc limiter 'cmd1' 'cmd2' file2\n\n"
+		@printf "Usage :\n./pipex file1 'cmd1' 'cmd2' file2\n"
+		@printf "./pipex here_doc limiter 'cmd1' 'cmd2' file2\n"
+		@printf "./pipex file1 'cmd1' 'cmd2' ... 'cmdN' file2\n\n"
 
 bonus : $(NAME)
 
@@ -122,21 +123,21 @@ bonus_test2:	${NAME}
 
 # Remove object files
 clean :
-		@printf "$(RE)Removing $(OBJS_DIR) ... $(RC)"
+		@printf "$(RE)Removing $(OBJS_DIR) ... "
 		@rm -rf $(OBJS_DIR)
-		@printf "$(RE)Done$(RC)\n"
-		@printf "$(RE)Cleaning libft ... $(RC)"
+		@printf "Done\n"
+		@printf "Cleaning libft ... "
 		@make clean -C libft
-		@printf "$(RE)Done$(RC)\n"
+		@printf "Done$(RC)\n"
 
 # Remove object and binary files
 fclean : clean
-		@printf "$(RE)Removing $(NAME) ... $(RC)"
+		@printf "$(RE)Removing $(NAME) ... "
 		@rm -f $(NAME)
-		@printf "$(RE)Done$(RC)\n"
-		@printf "$(RE)Removing libft.a ... $(RC)"
+		@printf "Done\n"
+		@printf "Removing libft.a ... "
 		@make fclean -C libft
-		@printf "$(RE)Done$(RC)\n"
+		@printf "Done$(RC)\n"
 
 # Remove all and recompile
 re :	 fclean all

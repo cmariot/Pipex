@@ -72,20 +72,20 @@ BONUS_OBJS = ${BONUS_SRCS:.c=.o}
 RM = rm -rf
 
 .c.o:
-			${CC} ${CCFLAGS} -c $< -o ${<:.c=.o}
+			@${CC} ${CCFLAGS} -c $< -o ${<:.c=.o}
 
 all:		${NAME}
 
 $(NAME):	${OBJS}
-			ar rc ${NAME} ${OBJS}
+			@ar rc ${NAME} ${OBJS}
 
 bonus: 		${OBJS} ${BONUS_OBJS}
-			ar rc ${NAME} ${OBJS} ${BONUS_OBJS}
+			@ar rc ${NAME} ${OBJS} ${BONUS_OBJS}
 
 clean:
-			${RM} ${OBJS} ${BONUS_OBJS}
+			@${RM} ${OBJS} ${BONUS_OBJS}
 
 fclean:		clean
-			${RM} ${NAME}
+			@${RM} ${NAME}
 
 re:			fclean all
