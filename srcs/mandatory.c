@@ -6,7 +6,7 @@
 /*   By: cmariot <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/28 17:45:43 by cmariot           #+#    #+#             */
-/*   Updated: 2021/10/05 12:22:54 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/10/06 13:23:56 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,18 +45,19 @@ void	parent_redirection(char *file2, int *pipe_fd, int stdin_saved)
    Create redirections with dup2(), close unused FD,
    Execute command1 (input = file1, output = fd[1])
    Restore the default redirections. */
-void	parent(char *file2, int *pipe_fd, char *command2, char **env)
+int	parent(char *file2, int *pipe_fd, char *command2, char **env)
 {
 	int	stdin_saved;
 	int	stdout_saved;
+	int	exit_status;
 
 	stdin_saved = dup(STDIN);
 	stdout_saved = dup(STDOUT);
 	parent_redirection(file2, pipe_fd, stdin_saved);
-	execute_cmd(command2, env);
+	exit_status = execute_cmd(command2, env);
 	dup2(stdin_saved, 0);
 	dup2(stdout_saved, 1);
-	exit(EXIT_SUCCESS);
+	return (exit_status);
 }
 
 /* Create the redirection FILE1 (SDTIN) --> FD[1] (STDOUT) */
@@ -113,6 +114,7 @@ int	mandatory(char **argv, char **env)
 	int		fd[2];
 	pid_t	pid;
 	int		status;
+	int		exit_status;
 
 	pipe(fd);
 	pid = fork();
@@ -122,12 +124,15 @@ int	mandatory(char **argv, char **env)
 		return (-1);
 	}
 	if (pid == 0)
+	{
 		child(argv[1], fd, argv[2], env);
+		exit(EXIT_SUCCESS);
+	}
 	else
 	{
 		waitpid(pid, &status, 0);
-		parent(argv[4], fd, argv[3], env);
+		exit_status = parent(argv[4], fd, argv[3], env);
 		close(fd[1]);
+		exit(exit_status);
 	}
-	return (0);
 }

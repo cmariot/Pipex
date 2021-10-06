@@ -1,3 +1,0 @@
-- [ ] Infinite loop in the child process doesn't crash
-- [ ] An executable in the folder can't be launched
-- [ ] Error numbers
