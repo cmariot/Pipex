@@ -6,7 +6,7 @@
 /*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/25 16:53:43 by cmariot           #+#    #+#             */
-/*   Updated: 2021/10/05 16:15:02 by cmariot          ###   ########.fr       */
+/*   Updated: 2021/10/06 10:20:16 by cmariot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,13 @@ int	try_command(char **path_array, char **command_array, char **env)
 	char	*path_with_slash;
 	char	*command_path;
 	int		i;
-	
-	if (access(command_array[0], F_OK) == 0)
-		if (access(command_array[0], X_OK) == 0)
-			if (fork_command(&command_array[0], command_array, env) == 0)
+
+	command_path = ft_strjoin("./", command_array[0]);
+	if (access(command_path, F_OK) == 0)
+		if (access(command_path, X_OK) == 0)
+			if (fork_command(&command_path, command_array, env) == 0)
 				return (0);
+	free(command_path);
 	i = 0;
 	while (path_array[i])
 	{
